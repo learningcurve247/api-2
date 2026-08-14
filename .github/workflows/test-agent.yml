@@ -1,0 +1,33 @@
+name: Tester Agent
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Run tests
+        run: mvn -B test
+
+      - name: Add label if tests pass
+        if: success()
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: tests-passed
+
+      - name: Add label if tests fail
+        if: failure()
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: tests-failed
